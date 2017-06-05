@@ -71,18 +71,9 @@ CarSystem::CarSystem(uint8_t id, uint8_t len) {
 
 void CarSystem::serialize() {
   uint8_t packetSize = _data->getSize();
-  
-  //char* result = (char*)calloc(sizeof(char), packetSize+1);
-  //strcpy(result, "s>");
-  //strcat(result, _id);
-  //strcat(result, packetSize);
-  //strcat(result, _data->serialize());
-  //strcat(result, "|");
-  //return result;
-
   char* data = _data->serialize();
 
-  Serial.write("s>");
+  Serial.write(">s");
   Serial.write(_id);
   Serial.write(packetSize);
   for (int i = 0; i < packetSize; i++) {
