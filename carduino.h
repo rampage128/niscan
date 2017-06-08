@@ -39,7 +39,7 @@ class CarSystem {
 
 class ClimateControl : public CarSystem {
   public:
-    ClimateControl();
+    ClimateControl() :  CarSystem(0x24, 3) {}
     void setAc(bool state);
     void setAuto(bool state);
     void setAirductWindshield(bool state);
@@ -51,6 +51,15 @@ class ClimateControl : public CarSystem {
     void setFanLevel(uint8_t fans);
     void setDesiredTemperature(uint8_t temperature);
 };
+
+class GearBox : public CarSystem {
+  public:
+    GearBox() :  CarSystem(0x67, 2) {}
+    void setGear(int8_t gear);
+    void setSynchroRev(bool state);
+};
+
+////////////////////////////////////////////////////////////////////////
 
 class CarSystemPopulator {
   protected:

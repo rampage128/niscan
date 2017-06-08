@@ -9,4 +9,10 @@ class NissanClimateControlPopulator : public CarSystemPopulator {
     virtual void populate(CanPacket* packet);
 };
 
+class NissanGearBoxPopulator : public CarSystemPopulator {
+  public:
+    NissanGearBoxPopulator(CarSystem* systemInstance) : CarSystemPopulator(systemInstance) {}
+    virtual void populate(CanPacket* packet);
+};
+
 #endif

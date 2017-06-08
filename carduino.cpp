@@ -84,10 +84,6 @@ void CarSystem::serialize() {
 
 //////////////////////////////////////////
 
-ClimateControl::ClimateControl() :  CarSystem(0x24, 3) {
-  // INTENTIONALLY LEFT BLANK
-}
-
 void ClimateControl::setAc(bool state) {
   _data->setFlag(0, 0x80, state);
 }
@@ -128,5 +124,12 @@ void ClimateControl::setDesiredTemperature(uint8_t temperature) {
   _data->setByte(2, temperature);
 }
 
-/////////////////////////////////////////////////////
+//////////////////////////////////////////
 
+void GearBox::setGear(int8_t gearNum) {
+  _data->setByte(0, gearNum);
+}
+
+void GearBox::setSynchroRev(bool state) {
+  _data->setFlag(0, 0x80, state);
+}

@@ -1,5 +1,30 @@
+#include <arduino.h>
+
 #include "niscan.h"
 #include "niscan_dfs.h"
+
+void NissanGearBoxPopulator::populate(CanPacket *packet) {
+  if (packet->getId() == 0x421) {
+    GearBox *gbSystem = (GearBox*)_system;
+
+    unsigned char gear = 0;
+    bool isSynchroRev = false;
+
+    packet->readByte(0, gear);
+    packet->checkFlag(1, B01000000, B01000000, isSynchroRev);
+
+    // gear is N (0) or R (-1)
+    if (gear < 0x80) {
+      gbSystem->setGear(((int8_t)gear / 8) - 3);
+    }
+    // gear is 1-6
+    else {
+      gbSystem->setGear(((int8_t)gear - 120) / 8);
+    }
+
+    gbSystem->setSynchroRev(isSynchroRev);
+  }
+}
 
 void NissanClimateControlPopulator::populate(CanPacket *packet) {
   ClimateControl *ccSystem = (ClimateControl*)_system;
