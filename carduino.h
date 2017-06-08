@@ -52,12 +52,12 @@ class ClimateControl : public CarSystem {
     void setDesiredTemperature(uint8_t temperature);
 };
 
-template<typename T> class CarSystemPopulator {
+class CarSystemPopulator {
   protected:
-    T* _system;
+    CarSystem* _system;
   public:
-    CarSystemPopulator(T* _system);
-    virtual void populate(CanPacket* packet);
+    CarSystemPopulator(CarSystem* systemInstance) { _system = systemInstance; }
+    virtual void populate(CanPacket* packet) = 0;
 };
 
 #endif

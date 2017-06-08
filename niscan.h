@@ -3,12 +3,10 @@
 
 #include "carduino.h"
 
-typedef CarSystemPopulator<ClimateControl> NissanClimateControlPopulator;
-/*
-template<typename T> class NissanClimateControlPopulator : public CarSystemPopulator<ClimateControl> {
+class NissanClimateControlPopulator : public CarSystemPopulator {
   public:
-    void populate(CanPacket* packet);
+    NissanClimateControlPopulator(CarSystem* systemInstance) : CarSystemPopulator(systemInstance) {}
+    virtual void populate(CanPacket* packet);
 };
-*/
 
 #endif

@@ -1,11 +1,9 @@
 #include "niscan.h"
 #include "niscan_dfs.h"
 
-template<> CarSystemPopulator<ClimateControl>::CarSystemPopulator(ClimateControl* sys) {
-  _system = sys;
-}
-
-template<> void NissanClimateControlPopulator::populate(CanPacket* packet) {
+void NissanClimateControlPopulator::populate(CanPacket *packet) {
+  ClimateControl *ccSystem = (ClimateControl*)_system;
+  
   unsigned char temp = 0;
 
   unsigned char mode;
@@ -21,7 +19,7 @@ template<> void NissanClimateControlPopulator::populate(CanPacket* packet) {
   switch (packet->getId()) {
     case (NIS_AC1_IDX):
     packet->readByte(NIS_AC1_TEMP_IDX, temp);
-    _system->setDesiredTemperature(temp);
+    ccSystem->setDesiredTemperature(temp);
     break;
     case (NIS_AC2_IDX):
     packet->readByte(NIS_AC2_MODE_IDX, mode);
@@ -31,43 +29,43 @@ template<> void NissanClimateControlPopulator::populate(CanPacket* packet) {
     packet->readByte(NIS_AC2_FANS_IDX, fans);
     switch (mode) {
       case (NIS_AC2_MODE_OFF):
-      _system->setAirductWindshield(false);
-      _system->setAirductFace(false);
-      _system->setAirductFeet(false);
+      ccSystem->setAirductWindshield(false);
+      ccSystem->setAirductFace(false);
+      ccSystem->setAirductFeet(false);
       break;
       case (NIS_AC2_MODE_FEET):
-      _system->setAirductWindshield(false);
-      _system->setAirductFace(false);
-      _system->setAirductFeet(true);
+      ccSystem->setAirductWindshield(false);
+      ccSystem->setAirductFace(false);
+      ccSystem->setAirductFeet(true);
       break;
       case (NIS_AC2_MODE_WINDFEET):
-      _system->setAirductWindshield(true);
-      _system->setAirductFace(false);
-      _system->setAirductFeet(true);
+      ccSystem->setAirductWindshield(true);
+      ccSystem->setAirductFace(false);
+      ccSystem->setAirductFeet(true);
       break;
       case (NIS_AC2_MODE_FACE):
-      _system->setAirductWindshield(false);
-      _system->setAirductFace(true);
-      _system->setAirductFeet(false);
+      ccSystem->setAirductWindshield(false);
+      ccSystem->setAirductFace(true);
+      ccSystem->setAirductFeet(false);
       break;
       case (NIS_AC2_MODE_FACEFEET):
-      _system->setAirductWindshield(false);
-      _system->setAirductFace(true);
-      _system->setAirductFeet(true);
+      ccSystem->setAirductWindshield(false);
+      ccSystem->setAirductFace(true);
+      ccSystem->setAirductFeet(true);
       break;
     }
-    _system->setWindshieldHeating(isWindshieldOn);
-    _system->setRecirculation(isReciOn);
-    _system->setAuto(isAutomatic);
-    _system->setFanLevel((fans - 4) / 8);
+    ccSystem->setWindshieldHeating(isWindshieldOn);
+    ccSystem->setRecirculation(isReciOn);
+    ccSystem->setAuto(isAutomatic);
+    ccSystem->setFanLevel((fans - 4) / 8);
     break;
     case (NIS_AC3_IDX):
     packet->checkFlag(NIS_AC3_AC_IDX, NIS_AC3_AC_MSK, NIS_AC3_AC_ON, isAcOn);
-    _system->setAc(isAcOn);
+    ccSystem->setAc(isAcOn);
     break;
     case (NIS_AC4_IDX):
     packet->checkFlag(NIS_AC4_RH_IDX, NIS_AC4_RH_MSK, NIS_AC4_RH_ON, isRearHeaterOn);
-    _system->setRearWindowHeating(isRearHeaterOn);
+    ccSystem->setRearWindowHeating(isRearHeaterOn);
     break;
   }
 }

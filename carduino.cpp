@@ -130,6 +130,3 @@ void ClimateControl::setDesiredTemperature(uint8_t temperature) {
 
 /////////////////////////////////////////////////////
 
-template<class T> CarSystemPopulator<T>::CarSystemPopulator(T* sys) {
-  _system = sys;
-}
