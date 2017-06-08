@@ -18,19 +18,20 @@ void setup() {
   
   // Initialize MCP2515 running at 8MHz with a baudrate of 500kb/s and the masks and filters disabled.
   if (CAN0.begin(MCP_ANY, CAN_500KBPS, MCP_8MHZ) == CAN_OK) {
-    Serial.println("MCP2515 Initialized Successfully!");
+    // Set operation mode to normal so the MCP2515 sends acks to received data.
+    CAN0.setMode(MCP_NORMAL);                     
+
+    // Configuring pin for /INT input
+    pinMode(CAN0_INT, INPUT);
+    Serial.write(">ardy|");
   }
   else {
-    Serial.println("Error Initializing MCP2515...");
+    Serial.write(">e");
+    Serial.write(0x01);
+    Serial.write("|");
   }
 
-  // Set operation mode to normal so the MCP2515 sends acks to received data.
-  CAN0.setMode(MCP_NORMAL);                     
-
-  // Configuring pin for /INT input
-  pinMode(CAN0_INT, INPUT);                            
-  
-  Serial.println("Listening...");
+  Serial.flush();
 }
 
 void loop() {
