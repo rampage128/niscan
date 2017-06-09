@@ -39,9 +39,9 @@ void setup() {
 void loop() {
   // Read can-bus data
   if (!digitalRead(CAN0_INT)) { 
-    CanPacket package = CanPacket::fromMcp(CAN0);
-    climateControlPopulator.populate(&package);
-    gearBoxPopulator.populate(&package);
+    CanPacket packet = CanPacket::fromMcp(CAN0);
+    climateControlPopulator.populate(&packet);
+    gearBoxPopulator.populate(&packet);
   }
 
   every(500) {
