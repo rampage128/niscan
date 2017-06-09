@@ -4,14 +4,11 @@
 #include "niscan_dfs.h"
 
 void NissanGearBoxPopulator::populate(CanPacket *packet) {
-  if (packet->getId() == 0x421) {
+  if (packet->getId() == 0x421) {   
     GearBox *gbSystem = (GearBox*)_system;
+    BinaryData packetData = packet->getData();
 
-    unsigned char gear = 0;
-    bool isSynchroRev = false;
-
-    packet->readByte(0, gear);
-    packet->checkFlag(1, B01000000, B01000000, isSynchroRev);
+    unsigned char gear = packetData.readByte(0).data;
 
     // gear is N (0) or R (-1)
     if (gear < 0x80) {
@@ -22,37 +19,23 @@ void NissanGearBoxPopulator::populate(CanPacket *packet) {
       gbSystem->setGear(((int8_t)gear - 120) / 8);
     }
 
-    gbSystem->setSynchroRev(isSynchroRev);
+    gbSystem->setSynchroRev(packetData.readFlag(1, B01000000, B01000000).data);
   }
 }
 
 void NissanClimateControlPopulator::populate(CanPacket *packet) {
   ClimateControl *ccSystem = (ClimateControl*)_system;
-  
-  unsigned char temp = 0;
 
-  unsigned char mode;
-  bool isAutomatic = false;
-  bool isWindshieldOn = false;
-  bool isReciOn = false;
-  unsigned char fans;
-
-  bool isAcOn = false;
-  
-  bool isRearHeaterOn = false;
+  BinaryData packetData = packet->getData();
   
   switch (packet->getId()) {
     case (NIS_AC1_IDX):
-    packet->readByte(NIS_AC1_TEMP_IDX, temp);
-    ccSystem->setDesiredTemperature(temp);
+    ccSystem->setDesiredTemperature(packetData.readByte(NIS_AC1_TEMP_IDX).data);
     break;
     case (NIS_AC2_IDX):
-    packet->readByte(NIS_AC2_MODE_IDX, mode);
-    packet->checkFlag(NIS_AC2_WIND_IDX, NIS_AC2_WIND_MSK, NIS_AC2_WIND_ON, isWindshieldOn);
-    packet->checkFlag(NIS_AC2_RECI_IDX, NIS_AC2_RECI_MSK, NIS_AC2_RECI_ON, isReciOn);
-    packet->checkFlag(NIS_AC2_AUTO_IDX, NIS_AC2_AUTO_MSK, NIS_AC2_AUTO_ON, isAutomatic);
-    packet->readByte(NIS_AC2_FANS_IDX, fans);
-    switch (mode) {
+    
+    ccSystem->setFanLevel((packetData.readByte(NIS_AC2_FANS_IDX).data - 4) / 8);
+    switch (packetData.readByte(NIS_AC2_MODE_IDX).data) {
       case (NIS_AC2_MODE_OFF):
       ccSystem->setAirductWindshield(false);
       ccSystem->setAirductFace(false);
@@ -79,18 +62,16 @@ void NissanClimateControlPopulator::populate(CanPacket *packet) {
       ccSystem->setAirductFeet(true);
       break;
     }
-    ccSystem->setWindshieldHeating(isWindshieldOn);
-    ccSystem->setRecirculation(isReciOn);
-    ccSystem->setAuto(isAutomatic);
-    ccSystem->setFanLevel((fans - 4) / 8);
+    ccSystem->setWindshieldHeating(packetData.readFlag(NIS_AC2_WIND_IDX, NIS_AC2_WIND_MSK, NIS_AC2_WIND_ON).data);
+    ccSystem->setRecirculation(packetData.readFlag(NIS_AC2_RECI_IDX, NIS_AC2_RECI_MSK, NIS_AC2_RECI_ON).data);
+    ccSystem->setAuto(packetData.readFlag(NIS_AC2_AUTO_IDX, NIS_AC2_AUTO_MSK, NIS_AC2_AUTO_ON).data);
+    
     break;
     case (NIS_AC3_IDX):
-    packet->checkFlag(NIS_AC3_AC_IDX, NIS_AC3_AC_MSK, NIS_AC3_AC_ON, isAcOn);
-    ccSystem->setAc(isAcOn);
+    ccSystem->setAc(packetData.readFlag(NIS_AC3_AC_IDX, NIS_AC3_AC_MSK, NIS_AC3_AC_ON).data);
     break;
     case (NIS_AC4_IDX):
-    packet->checkFlag(NIS_AC4_RH_IDX, NIS_AC4_RH_MSK, NIS_AC4_RH_ON, isRearHeaterOn);
-    ccSystem->setRearWindowHeating(isRearHeaterOn);
+    ccSystem->setRearWindowHeating(packetData.readFlag(NIS_AC4_RH_IDX, NIS_AC4_RH_MSK, NIS_AC4_RH_ON).data);
     break;
   }
 }
