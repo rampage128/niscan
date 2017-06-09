@@ -1,10 +1,7 @@
 #include <arduino.h>
 #include "binarydata.h"
 
-BinaryData::BinaryData(uint8_t len) {
-  _len = len;
-  _payload = (char*)calloc(sizeof(char), _len+1);
-}
+
 
 BinaryData::~BinaryData() {
   free(_payload);

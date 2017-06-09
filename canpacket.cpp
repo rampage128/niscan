@@ -2,9 +2,9 @@
 
 CanPacket::CanPacket(long unsigned int id, unsigned char len, unsigned char rxBuf[8]) {
   _id = id;
-  BinaryData _data(len);
+  _data = new BinaryData(len);
   for (uint8_t i = 0; i < len; i++) {
-    _data.writeByte(i, rxBuf[i]);
+    _data->writeByte(i, rxBuf[i]);
   }
 }
 
@@ -20,7 +20,7 @@ CanPacket CanPacket::fromMcp(MCP_CAN mcp) {
   return packet;
 }
 
-BinaryData CanPacket::getData() {
+BinaryData* CanPacket::getData() {
   return _data;
 }
 

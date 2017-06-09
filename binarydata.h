@@ -5,7 +5,10 @@
 
 class BinaryData {
   public:
-    BinaryData(uint8_t len);
+    BinaryData(uint8_t len) {
+      _len = len;
+      _payload = (char*)calloc(sizeof(char), _len+1);
+    };
     virtual ~BinaryData();
     typedef enum STATUS {
       OK,

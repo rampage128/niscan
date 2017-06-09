@@ -9,7 +9,13 @@ class CarSystem {
     uint8_t _id;
     BinaryData* _data;
   public:
-    CarSystem(uint8_t id, uint8_t len);
+    CarSystem(uint8_t id, uint8_t len){
+      _id = id;
+      _data = new BinaryData(len);
+    };
+    ~CarSystem() {
+      free(_data);
+    }
     void serialize();
 };
 

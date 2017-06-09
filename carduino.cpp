@@ -1,11 +1,6 @@
 #include <arduino.h>
 #include "carduino.h"
 
-CarSystem::CarSystem(uint8_t id, uint8_t len) {
-  _id = id;
-  BinaryData _data(len);
-}
-
 void CarSystem::serialize() {
   uint8_t packetSize = _data->getSize();
   char* data = _data->getData();

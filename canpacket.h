@@ -7,7 +7,10 @@
 class CanPacket {
   public:
     static CanPacket fromMcp(MCP_CAN mcp);
-    BinaryData getData();
+    ~CanPacket() {
+      free(_data);
+    }
+    BinaryData* getData();
     long unsigned int getId();   
   private:
     CanPacket(long unsigned int id, uint8_t len, byte data[8]);
