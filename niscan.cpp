@@ -3,7 +3,7 @@
 #include "niscan.h"
 #include "niscan_dfs.h"
 
-void NissanGearBoxPopulator::populate(CanPacket *packet) {
+void NissanGearBoxCanConnector::readCan(CanPacket *packet) {
   if (packet->getId() == 0x421) {   
     GearBox *gbSystem = (GearBox*)_system;
     BinaryData* packetData = packet->getData();
@@ -23,7 +23,9 @@ void NissanGearBoxPopulator::populate(CanPacket *packet) {
   }
 }
 
-void NissanClimateControlPopulator::populate(CanPacket *packet) {
+////
+
+void NissanClimateControlCanConnector::readCan(CanPacket *packet) {
   ClimateControl *ccSystem = (ClimateControl*)_system;
 
   BinaryData* packetData = packet->getData();
@@ -74,5 +76,65 @@ void NissanClimateControlPopulator::populate(CanPacket *packet) {
     ccSystem->setRearWindowHeating(packetData->readFlag(NIS_AC4_RH_IDX, NIS_AC4_RH_MSK, NIS_AC4_RH_ON).data);
     break;
   }
+}
+
+void NissanClimateControlCanConnector::writeCan(MCP_CAN* can) {
+
+  _can1.writeByte(7, _roll);
+  _can2.writeByte(7, _roll);
+  _can3.writeByte(7, _roll);
+
+  can->sendMsgBuf(0x540, 0, 8, _can1.getData());
+  can->sendMsgBuf(0x541, 0, 8, _can2.getData());
+  can->sendMsgBuf(0x542, 0, 8, _can3.getData());
+
+  // reset rear heating flag after sending ... this is a special case.
+  _can2.writeFlag(1, B10000000, B00000000);
+
+  if (_roll < 3) {
+    _roll++;
+  }
+  else {
+    _roll = 0;
+  }
+}
+
+void NissanClimateControlCanConnector::pressModeButton() {
+  _can2.toggleFlag(0, B00010000);
+}
+
+void NissanClimateControlCanConnector::pressWindshieldButton() {
+  _can2.toggleFlag(0, B00000001);
+}
+
+void NissanClimateControlCanConnector::pressRearHeaterButton() {
+  // always write to 1 ... rear heating is different from all other flags
+  _can2.writeFlag(1, B10000000, B10000000);
+}
+
+void NissanClimateControlCanConnector::pressRecirculationButton() {
+  _can2.toggleFlag(1, B10000000);
+}
+
+void NissanClimateControlCanConnector::setTemperature(uint8_t temperature) {
+  _can2.toggleFlag(2, B10000000);
+  _can3.writeByte(1, temperature);
+}
+
+void NissanClimateControlCanConnector::pressAcButton() {
+  _can2.toggleFlag(2, B00000100);
+}
+
+void NissanClimateControlCanConnector::pressOffButton() {
+  _can2.toggleFlag(2, B00000001);
+}
+
+void NissanClimateControlCanConnector::pressAutoButton() {
+  _can2.toggleFlag(3, B10000000);
+}
+
+void NissanClimateControlCanConnector::setFanSpeed(uint8_t fanSpeed) {
+  _can2.toggleFlag(3, B00010000);
+  _can3.writeByte(0, fanSpeed * 8 + 4);
 }
 

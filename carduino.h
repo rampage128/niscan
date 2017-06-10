@@ -7,17 +7,19 @@
 class CarSystem {
   protected:
     uint8_t _id;
-    BinaryData* _data;
+    BinaryData* _state;
   public:
     CarSystem(uint8_t id, uint8_t len){
       _id = id;
-      _data = new BinaryData(len);
+      _state = new BinaryData(len);
     };
-    ~CarSystem() {
-      free(_data);
+    virtual ~CarSystem() {
+      free(_state);
     }
     void serialize();
 };
+
+////////////////////////////////////////////
 
 class ClimateControl : public CarSystem {
   public:
@@ -43,12 +45,13 @@ class GearBox : public CarSystem {
 
 ////////////////////////////////////////////////////////////////////////
 
-class CarSystemPopulator {
+class CarSystemCanConnector {
   protected:
     CarSystem* _system;
   public:
-    CarSystemPopulator(CarSystem* systemInstance) { _system = systemInstance; }
-    virtual void populate(CanPacket* packet) = 0;
+    CarSystemCanConnector(CarSystem* systemInstance) { _system = systemInstance; }
+    virtual void readCan(CanPacket* packet) = 0;
+    virtual void writeCan(MCP_CAN* mcp) {};
 };
 
 #endif

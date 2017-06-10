@@ -11,10 +11,10 @@
 MCP_CAN CAN0(10);
 
 ClimateControl climate;
-NissanClimateControlPopulator climateControlPopulator(&climate);
+NissanClimateControlCanConnector climateControlCanConnector(&climate);
 
 GearBox gearBox;
-NissanGearBoxPopulator gearBoxPopulator(&gearBox);
+NissanGearBoxCanConnector gearBoxCanConnector(&gearBox);
 
 void setup() {
   Serial.begin(115200);
@@ -39,13 +39,14 @@ void setup() {
 void loop() {
   // Read can-bus data
   if (!digitalRead(CAN0_INT)) { 
-    CanPacket packet = CanPacket::fromMcp(CAN0);
-    climateControlPopulator.populate(&packet);
-    gearBoxPopulator.populate(&packet);
+    CanPacket packet = CanPacket::fromMcp(&CAN0);
+    climateControlCanConnector.readCan(&packet);
+    gearBoxCanConnector.readCan(&packet);
   }
 
-  every(500) {
+  every(250) {
     climate.serialize();
+    climateControlCanConnector.writeCan(&CAN0);
   }
   every(1000) {
     gearBox.serialize();
