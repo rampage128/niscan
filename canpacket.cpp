@@ -1,67 +1,30 @@
-#include <stdint.h>
 #include "canpacket.h"
 
-CanPacket::CanPacket(void) {
-  // INTENTIONALLY LEFT BLANK
+CanPacket::CanPacket(long unsigned int id, unsigned char len, unsigned char rxBuf[8]) {
+  _id = id;
+  _data = new BinaryData(len);
+  for (uint8_t i = 0; i < len; i++) {
+    _data->writeByte(i, rxBuf[i]);
+  }
 }
 
 CanPacket CanPacket::fromMcp(MCP_CAN mcp) {
-  CanPacket packet;
-  mcp.readMsgBuf(&packet.rxId, &packet.len, packet.rxBuf); 
+  long unsigned int id = 0;
+  unsigned char len = 0;
+  unsigned char rxBuf[8];
+  
+  mcp.readMsgBuf(&id, &len, rxBuf); 
+
+  CanPacket packet(id, len, rxBuf);
+  
   return packet;
 }
 
-CanPacket::PacketStatus CanPacket::readByte(uint8_t index, unsigned char &buf) {
-  if (checkIndex(index) == STATUS::INDEXOUTOFBOUNDS) {
-    return STATUS::INDEXOUTOFBOUNDS;
-  }
-  
-  buf = rxBuf[index];
-  return STATUS::OK;
-}
-
-CanPacket::PacketStatus CanPacket::checkFlag(uint8_t index, unsigned char mask, unsigned char comparator, bool &result) {
-  if (checkIndex(index) == STATUS::INDEXOUTOFBOUNDS) {
-    return STATUS::INDEXOUTOFBOUNDS;
-  }
-  
-  unsigned char tBuf = rxBuf[index] & mask; 
-  result = tBuf == comparator;
-
-  return STATUS::OK;
-}
-
-CanPacket::PacketStatus CanPacket::writeFlag(uint8_t index, unsigned char mask, bool value) {
-  if (checkIndex(index) == STATUS::INDEXOUTOFBOUNDS) {
-    return STATUS::INDEXOUTOFBOUNDS;
-  }
-
-  if (value) {
-    rxBuf[index] |= mask;
-  } 
-  else {
-    rxBuf[index] &= ~mask;
-  }
-  return STATUS::OK;
-}
-
-CanPacket::PacketStatus CanPacket::writeByte(uint8_t index, unsigned char value) {
-  if (checkIndex(index) == PacketStatus::INDEXOUTOFBOUNDS) {
-    return PacketStatus::INDEXOUTOFBOUNDS;
-  }
-
-  rxBuf[index] = value;
-  return PacketStatus::OK;
-}
-
-CanPacket::PacketStatus CanPacket::checkIndex(uint8_t index) {
-  if (len <= index || index < 0) {
-    return PacketStatus::INDEXOUTOFBOUNDS;
-  }
-  return PacketStatus::OK;
+BinaryData* CanPacket::getData() {
+  return _data;
 }
 
 long unsigned int CanPacket::getId() {
-  return rxId;
+  return _id;
 }
 
