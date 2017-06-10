@@ -22,8 +22,10 @@ class BinaryData {
       AccessStatus state;
       bool data;
     };
+    AccessStatus toggleFlag(uint8_t index, unsigned char mask);
     AccessStatus writeFlag(uint8_t index, unsigned char mask, bool value);
     AccessStatus writeByte(uint8_t index, unsigned char value);
+    AccessStatus writeData(uint8_t index, BinaryData* data);
     BoolResult readFlag(uint8_t index, unsigned char mask, unsigned char comparator);
     ByteResult readByte(uint8_t index);
     char* getData();

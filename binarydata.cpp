@@ -33,6 +33,14 @@ BinaryData::ByteResult BinaryData::readByte(uint8_t index) {
   return result;
 }
 
+BinaryData::AccessStatus BinaryData::toggleFlag(uint8_t index, unsigned char mask) {
+  if (checkIndex(index) == AccessStatus::INDEXOUTOFBOUNDS) {
+    return AccessStatus::INDEXOUTOFBOUNDS;
+  }
+
+  _payload[index] ^= mask;
+}
+
 BinaryData::AccessStatus BinaryData::writeFlag(uint8_t index, unsigned char mask, bool value) {
   if (checkIndex(index) == AccessStatus::INDEXOUTOFBOUNDS) {
     return AccessStatus::INDEXOUTOFBOUNDS;
@@ -53,6 +61,25 @@ BinaryData::AccessStatus BinaryData::writeByte(uint8_t index, unsigned char valu
   }
 
   _payload[index] = value;
+  return STATUS::OK;
+}
+
+BinaryData::AccessStatus BinaryData::writeData(uint8_t index, BinaryData* data) {
+  int inputLen = index + data->getSize();
+
+  if (checkIndex(index) == AccessStatus::INDEXOUTOFBOUNDS) {
+    return AccessStatus::INDEXOUTOFBOUNDS;
+  }
+  if (checkIndex(inputLen-1) == AccessStatus::INDEXOUTOFBOUNDS) {
+    return AccessStatus::INDEXOUTOFBOUNDS;
+  }
+
+  char* inputData = data->getData();
+
+  for (int i = index; i < inputLen; i++) {
+    _payload[i] = inputData[i - index];
+  }
+
   return STATUS::OK;
 }
 
