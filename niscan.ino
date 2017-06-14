@@ -23,7 +23,9 @@ void setup() {
   if (CAN0.begin(MCP_ANY, CAN_500KBPS, MCP_8MHZ) == CAN_OK) {
     CAN0.setMode(MCP_NORMAL);                     
     pinMode(CAN0_INT, INPUT);
-    Serial.write(">ardy|");
+    Serial.write(">a");
+    Serial.write(0x01);
+    Serial.write("|");
   }
   // Notify serial on error
   else {
