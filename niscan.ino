@@ -23,15 +23,15 @@ void setup() {
   if (CAN0.begin(MCP_ANY, CAN_500KBPS, MCP_8MHZ) == CAN_OK) {
     CAN0.setMode(MCP_NORMAL);                     
     pinMode(CAN0_INT, INPUT);
-    Serial.write(">a");
+    Serial.write("{a");
     Serial.write(0x01);
-    Serial.write("|");
+    Serial.write("}");
   }
   // Notify serial on error
   else {
-    Serial.write(">e");
+    Serial.write("{e");
     Serial.write(0x01);
-    Serial.write("|");
+    Serial.write("}");
   }
 
   // Make sure we sent all serial data, before entering the loop

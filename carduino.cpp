@@ -5,13 +5,13 @@ void CarSystem::serialize() {
   uint8_t packetSize = _state->getSize();
   char* data = _state->getData();
 
-  Serial.write(">s");
+  Serial.write("{s");
   Serial.write(_id);
   Serial.write(packetSize);
   for (int i = 0; i < packetSize; i++) {
     Serial.write(data[i]);
   }
-  Serial.write("|");
+  Serial.write("}");
 }
 
 //////////////////////////////////////////
