@@ -23,7 +23,7 @@ class CarSystem {
 
 class ClimateControl : public CarSystem {
   public:
-    ClimateControl() :  CarSystem(0x24, 3) {}
+    ClimateControl() :  CarSystem(0x63, 3) {}
     void setAc(bool state);
     void setAuto(bool state);
     void setAirductWindshield(bool state);
