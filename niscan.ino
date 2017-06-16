@@ -41,9 +41,10 @@ void setup() {
 void loop() {
   // Read can-bus data
   if (!digitalRead(CAN0_INT)) { 
-    CanPacket packet = CanPacket::fromMcp(&CAN0);
-    climateControlCanConnector.readCan(&packet);
-    gearBoxCanConnector.readCan(&packet);
+    CanPacket* packet = CanPacket::fromMcp(&CAN0);
+    climateControlCanConnector.readCan(packet);
+    gearBoxCanConnector.readCan(packet);
+    delete packet;
   }
 
   every(250) {

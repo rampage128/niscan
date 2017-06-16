@@ -6,9 +6,9 @@
 
 class CanPacket {
   public:
-    static CanPacket fromMcp(MCP_CAN* mcp);
+    static CanPacket* fromMcp(MCP_CAN* mcp);
     ~CanPacket() {
-      free(_data);
+      delete _data;
     }
     BinaryData* getData();
     long unsigned int getId();   

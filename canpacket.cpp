@@ -8,14 +8,14 @@ CanPacket::CanPacket(long unsigned int id, unsigned char len, unsigned char rxBu
   }
 }
 
-CanPacket CanPacket::fromMcp(MCP_CAN* mcp) {
+CanPacket* CanPacket::fromMcp(MCP_CAN* mcp) {
   long unsigned int id = 0;
   unsigned char len = 0;
   unsigned char rxBuf[8];
   
   mcp->readMsgBuf(&id, &len, rxBuf); 
 
-  CanPacket packet(id, len, rxBuf);
+  CanPacket* packet = new CanPacket(id, len, rxBuf);
   
   return packet;
 }
