@@ -113,7 +113,7 @@ void NissanClimateControlCanConnector::pressRearHeaterButton() {
 }
 
 void NissanClimateControlCanConnector::pressRecirculationButton() {
-  _can2.toggleFlag(1, B10000000);
+  _can2.toggleFlag(1, B00000010);
 }
 
 void NissanClimateControlCanConnector::setTemperature(uint8_t temperature) {
@@ -135,6 +135,6 @@ void NissanClimateControlCanConnector::pressAutoButton() {
 
 void NissanClimateControlCanConnector::setFanSpeed(uint8_t fanSpeed) {
   _can2.toggleFlag(3, B00010000);
-  _can3.writeByte(0, fanSpeed * 8 + 4);
+  _can3.writeByte(0, fanSpeed * 8);
 }
 

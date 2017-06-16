@@ -55,3 +55,67 @@ void loop() {
   }
 }
 
+
+int readIndex = -1;
+int packetStartIndex = -1;
+int packetEndIndex = -1;
+byte data[16] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+void serialEvent(){
+  while(Serial.available() && packetEndIndex == -1 && readIndex < 16) {
+    data[++readIndex] = Serial.read();
+    byte singleData = data[readIndex];
+
+    if (packetStartIndex == -1 && singleData == 0x7b) {
+      packetStartIndex = readIndex;
+      continue;
+    }
+
+    if (singleData == 0x7d) {
+      packetEndIndex = readIndex;
+      continue;
+    }
+  }
+
+  if (packetStartIndex > -1 && packetEndIndex > packetStartIndex) {
+    if (data[packetStartIndex+1] == 0x63) {
+      switch (data[packetStartIndex+2]) {
+        case 0x01: // OFF BUTTON
+          climateControlCanConnector.pressOffButton();
+          break;
+        case 0x02: // ac button
+          climateControlCanConnector.pressAcButton();
+          break;
+        case 0x03: // auto button
+          climateControlCanConnector.pressAutoButton();
+          break;
+        case 0x04: // recirculation button
+          climateControlCanConnector.pressRecirculationButton();
+          break;
+        case 0x05: // windshield heating button
+          climateControlCanConnector.pressWindshieldButton();
+          break;
+        case 0x06: // rear window heating button
+          climateControlCanConnector.pressRearHeaterButton();
+          break;
+        case 0x07: // mode button
+          climateControlCanConnector.pressModeButton();
+          break;
+        case 0x08: // temperature knob
+          climateControlCanConnector.setTemperature(data[packetStartIndex+4]);
+          break;
+        case 0x09: // fan level
+          climateControlCanConnector.setFanSpeed(data[packetStartIndex+4]);
+          break;
+      }
+    }
+
+    readIndex = -1;
+    packetStartIndex = -1;
+    packetEndIndex = -1;
+    for (int i = 0; i < 16; i++) {
+      data[i] = 0x00;
+    }
+  }
+}
+
