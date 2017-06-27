@@ -16,6 +16,8 @@ NissanClimateControlCanConnector climateControlCanConnector(&climate);
 GearBox gearBox;
 NissanGearBoxCanConnector gearBoxCanConnector(&gearBox);
 
+bool sniff = false;
+
 void setup() {
   Serial.begin(115200);
 
@@ -44,15 +46,33 @@ void loop() {
     CanPacket* packet = CanPacket::fromMcp(&CAN0);
     climateControlCanConnector.readCan(packet);
     gearBoxCanConnector.readCan(packet);
+    if (sniff) {
+      BinaryData* data = packet->getData();
+      uint8_t packetSize = data->getSize();
+
+      unsigned long int packetId = packet->getId();
+      int packetIdLenght = sizeof(packetId);
+
+      Serial.write("{b");
+      Serial.write(0x6d);
+      Serial.write(packetSize + packetIdLenght);
+      Serial.write((byte*)&packetId, packetIdLenght);
+      for (int i = 0; i < packetSize; i++) {
+        Serial.write(data->readByte(i).data);
+      }
+      Serial.write("}");
+    }
     delete packet;
   }
 
-  every(250) {
-    climate.serialize();
-    climateControlCanConnector.writeCan(&CAN0);
-  }
-  every(1000) {
-    gearBox.serialize();
+  if (!sniff) {
+    every(250) {
+      climate.serialize();
+      climateControlCanConnector.writeCan(&CAN0);
+    }
+    every(1000) {
+      gearBox.serialize();
+    }
   }
 }
 
@@ -107,6 +127,12 @@ void serialEvent(){
           break;
         case 0x09: // fan level
           climateControlCanConnector.setFanSpeed(data[packetStartIndex+4]);
+          break;
+        case 0x0a: // start sniffer
+          sniff = true;
+          break;
+        case 0x0b: // stop sniffer
+          sniff = false;
           break;
       }
     }
