@@ -1,7 +1,7 @@
 #include <everytime.h>
-
 #include <mcp_can.h>
 #include <SPI.h>
+#include "network.h"
 #include "canpacket.h"
 #include "carduino.h"
 #include "niscan_dfs.h"
@@ -40,6 +40,21 @@ void setup() {
   Serial.flush();
 }
 
+void setBaudRate(unsigned long newBaudRate) {
+  unsigned long responseBaudRate = htonl(newBaudRate);
+  Serial.write("{a");
+  Serial.write(0x02);
+  Serial.write(sizeof(responseBaudRate));
+  Serial.write((byte*)&responseBaudRate, sizeof(responseBaudRate));
+  Serial.write("}");
+  Serial.flush();
+  Serial.end();
+  Serial.begin(newBaudRate);
+  while (Serial.available()) {
+    Serial.read();
+  }
+}
+
 void loop() {
   // Read can-bus data
   if (!digitalRead(CAN0_INT)) { 
@@ -50,7 +65,7 @@ void loop() {
       BinaryData* data = packet->getData();
       uint8_t packetSize = data->getSize();
 
-      unsigned long int packetId = packet->getId();
+      unsigned long int packetId = htonl(packet->getId());
       int packetIdLenght = sizeof(packetId);
 
       Serial.write("{b");
@@ -134,6 +149,9 @@ void serialEvent(){
         case 0x0b: // stop sniffer
           sniff = false;
           break;
+        case 0x0d: // set baud rate
+          byte brd[4] = { data[packetStartIndex+4], data[packetStartIndex+5], data[packetStartIndex+6], data[packetStartIndex+7] };
+          setBaudRate((unsigned long)ntohl(*((long *)brd)));
       }
     }
 
