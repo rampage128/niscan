@@ -1,8 +1,6 @@
 #include <arduino.h>
 #include "binarydata.h"
 
-
-
 BinaryData::~BinaryData() {
   free(_payload);
 }
@@ -29,6 +27,19 @@ BinaryData::ByteResult BinaryData::readByte(uint8_t index) {
   }
 
   result.data = _payload[index];
+  result.state = AccessStatus::OK;
+  return result;
+}
+
+BinaryData::LongResult BinaryData::readLong(uint8_t index) {
+  struct LongResult result;
+
+  if (checkIndex(index + 4) == AccessStatus::INDEXOUTOFBOUNDS) {
+    result.state = AccessStatus::INDEXOUTOFBOUNDS;
+    return result;
+  }
+
+  result.data = (unsigned long)ntohl(*((long *)&_payload[index]));
   result.state = AccessStatus::OK;
   return result;
 }
