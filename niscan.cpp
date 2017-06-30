@@ -1,7 +1,75 @@
 #include <arduino.h>
-
+#include <everytime.h>
 #include "niscan.h"
 #include "niscan_dfs.h"
+
+void NissanCarConnector::updateFromSerial(BinaryBuffer* serialData) {
+  BinaryData::ByteResult buttonIdResult = serialData->readByte();
+  serialData->next();
+  BinaryData::ByteResult dataResult = serialData->readByte();
+
+  if (buttonIdResult.state == BinaryData::OK) {
+    switch (buttonIdResult.data) {
+      case 0x01: // OFF BUTTON
+        _climateControlConnector->pressOffButton();
+        break;
+      case 0x02: // ac button
+        _climateControlConnector->pressAcButton();
+        break;
+      case 0x03: // auto button
+        _climateControlConnector->pressAutoButton();
+        break;
+      case 0x04: // recirculation button
+        _climateControlConnector->pressRecirculationButton();
+        break;
+      case 0x05: // windshield heating button
+        _climateControlConnector->pressWindshieldButton();
+        break;
+      case 0x06: // rear window heating button
+        _climateControlConnector->pressRearHeaterButton();
+        break;
+      case 0x07: // mode button
+        _climateControlConnector->pressModeButton();
+        break;
+      case 0x08: // temperature knob
+        if (dataResult.state == BinaryData::OK) {
+          _climateControlConnector->setTemperature(dataResult.data);
+        }
+        break;
+      case 0x09: // fan level
+        if (dataResult.state == BinaryData::OK) {
+          _climateControlConnector->setFanSpeed(dataResult.data);
+        }
+        break;
+    }
+  }
+}
+
+void NissanCarConnector::updateFromCan(CanPacket* packet) {
+  switch (packet->getId()) {
+    case 0x421:
+      _gearBoxConnector->readCan(packet);
+      break;
+    case NIS_AC1_IDX:
+    case NIS_AC2_IDX:
+    case NIS_AC3_IDX:
+    case NIS_AC4_IDX:
+      _climateControlConnector->readCan(packet);
+      break;
+  }
+}
+
+void NissanCarConnector::broadcast(MCP_CAN* can) {
+  every(250) {
+    _climateControl->serialize();
+    _climateControlConnector->writeCan(can);
+  }
+  every(1000) {
+    _gearBox->serialize();
+  }
+}
+
+////
 
 void NissanGearBoxCanConnector::readCan(CanPacket *packet) {
   if (packet->getId() == 0x421) {   

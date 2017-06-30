@@ -34,5 +34,30 @@ class NissanGearBoxCanConnector : public CarSystemCanConnector {
     virtual void readCan(CanPacket* packet);
 };
 
+class NissanCarConnector : public CarConnector {
+  public:
+    NissanCarConnector(uint8_t canInterruptPin, uint8_t canCsPin) : CarConnector(canInterruptPin, canCsPin) {
+      _climateControl = new ClimateControl();
+      _climateControlConnector = new NissanClimateControlCanConnector(_climateControl);
+      _gearBox = new GearBox();
+      _gearBoxConnector = new NissanGearBoxCanConnector(_gearBox);
+    }
+    ~NissanCarConnector() {
+      delete _climateControl;
+      delete _climateControlConnector;
+      delete _gearBox;
+      delete _gearBoxConnector;
+    }
+    virtual void updateFromSerial(BinaryBuffer* serialData);
+  protected:
+    virtual void updateFromCan(CanPacket* packet);
+    virtual void broadcast(MCP_CAN* can);
+  private:
+    ClimateControl* _climateControl;
+    NissanClimateControlCanConnector* _climateControlConnector;
+    GearBox* _gearBox;
+    NissanGearBoxCanConnector* _gearBoxConnector;
+};
+
 #endif
 
