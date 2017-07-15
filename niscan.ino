@@ -5,6 +5,7 @@
 #include "niscan.h"
 
 NissanCarConnector carConnector(2, 10);
+NissanSteeringControl steeringControl;
 
 bool sniff = false;
 
@@ -28,6 +29,7 @@ void setup() {
 }
 
 void loop() {
+  steeringControl.check();
   carConnector.update();
 }
 

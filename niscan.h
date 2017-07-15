@@ -1,6 +1,7 @@
 #ifndef NISCAN_H
 #define NISCAN_H
 
+#include <AnalogMultiButton.h>
 #include "binarydata.h"
 #include "carduino.h"
 
@@ -57,6 +58,14 @@ class NissanCarConnector : public CarConnector {
     NissanClimateControlCanConnector* _climateControlConnector;
     GearBox* _gearBox;
     NissanGearBoxCanConnector* _gearBoxConnector;
+};
+
+class NissanSteeringControl {
+  public:
+    void check();
+  private:
+    AnalogMultiButton _buttons1 = AnalogMultiButton(A6, 5, (int[]){ 0, 210, 416, 620, 830 });
+    AnalogMultiButton _buttons2 = AnalogMultiButton(A7, 4, (int[]){ 0, 210, 416, 620 });
 };
 
 #endif

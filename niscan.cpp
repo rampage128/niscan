@@ -210,3 +210,61 @@ void NissanClimateControlCanConnector::setFanSpeed(uint8_t fanSpeed) {
   }
 }
 
+////
+
+void NissanSteeringControl::check() {
+  _buttons1.update();
+
+  uint8_t buttonId = 0;
+
+  // SOURCE
+  if(_buttons1.onReleaseBefore(0, 500)) {
+    buttonId = 1;
+  } else if (_buttons1.onPressAfter(0, 500)) {
+    buttonId = 2;
+  }
+  // MENU UP
+  if(_buttons1.onPressAndAfter(1, 1000, 500)) {
+    buttonId = 10;
+  }
+  // MENU DOWN
+  if(_buttons1.onPressAndAfter(2, 1000, 500)) {
+    buttonId = 11;
+  }
+  // VOICE
+  if(_buttons1.onReleaseBefore(3, 500)) {
+    buttonId = 42;
+  }
+  // ENTER
+  if(_buttons1.onReleaseBefore(4, 500)) {
+    buttonId = 12;
+  }
+
+  _buttons2.update();
+
+  // VOL DOWN
+  if(_buttons2.onPressAndAfter(0, 1000, 500)) {
+    buttonId = 20;
+  }
+  // VOL UP
+  if(_buttons2.onPressAndAfter(1, 1000, 500)) {
+    buttonId = 21;
+  }
+  // PHONE
+  if(_buttons2.onReleaseBefore(2, 500)) {
+    buttonId = 30;
+  }
+  // BACK
+  if(_buttons2.onReleaseBefore(3, 500)) {
+    buttonId = 13;
+  }
+
+  if (buttonId > 0) {
+    Serial.write("{s");
+    Serial.write(0x72);
+    Serial.write(0x01);
+    Serial.write(buttonId);
+    Serial.write("}\n");
+  }
+}
+

@@ -76,6 +76,7 @@ Also, if you like this or other of my projects, please feel free to support me u
 
 ## Dependencies
 
+- [AnalogMultiButton](https://github.com/dxinteractive/AnalogMultiButton) to read the steering wheel remote
 - [everytime](https://github.com/fesselk/everytime) for easy periodic code execution (send packets)
 - [MCP_CAN_lib](https://github.com/coryjfowler/MCP_CAN_lib) to communicate with CAN-Bus on MCP2515
 - [SPI library](https://www.arduino.cc/en/Reference/SPI) to utilize SPI interface
