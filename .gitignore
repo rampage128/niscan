@@ -1,0 +1,7 @@
+### Sloeber ###
+
+Release/*
+.settings/
+.cproject
+.project
+sloeber.ino.cpp
