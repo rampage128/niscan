@@ -10,6 +10,10 @@ NissanSteeringControl steeringControl;
 bool sniff = false;
 
 void setup() {
+  // pin3 set to high for USB-OTG
+  pinMode(3, OUTPUT);
+  digitalWrite(3, HIGH);
+  
   Serial.begin(115200);
 
   if (carConnector.setup()) {
