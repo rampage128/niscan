@@ -152,9 +152,9 @@ void NissanClimateControlCanConnector::writeCan(MCP_CAN* can) {
   _can2.writeByte(7, _roll);
   _can3.writeByte(7, _roll);
 
-  can->sendMsgBuf(0x540, 0, 8, _can1.getData());
-  can->sendMsgBuf(0x541, 0, 8, _can2.getData());
-  can->sendMsgBuf(0x542, 0, 8, _can3.getData());
+  can->sendMsgBuf(0x540, 0, 8, reinterpret_cast<INT8U*>(_can1.getData()));
+  can->sendMsgBuf(0x541, 0, 8, reinterpret_cast<INT8U*>(_can2.getData()));
+  can->sendMsgBuf(0x542, 0, 8, reinterpret_cast<INT8U*>(_can3.getData()));
 
   // reset rear heating flag after sending ... this is a special case.
   _can2.writeFlag(1, B10000000, B00000000);
