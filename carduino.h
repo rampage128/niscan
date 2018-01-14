@@ -55,6 +55,7 @@ class CarSystemCanConnector {
     CarSystemCanConnector(CarSystem* systemInstance) { _system = systemInstance; }
     virtual void readCan(CanPacket* packet) = 0;
     virtual void writeCan(MCP_CAN* mcp) {};
+    virtual ~CarSystemCanConnector() {};
 };
 
 ////////////////////////////////////////////////////////////////////////
