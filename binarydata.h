@@ -6,11 +6,8 @@
 
 class BinaryData {
   public:
-    BinaryData(uint8_t len) {
-      _len = len;
-      _payload = (char*)calloc(sizeof(char), _len+1);
-    };
-    virtual ~BinaryData();
+    BinaryData(uint8_t len);
+    ~BinaryData();
     typedef enum STATUS {
       OK,
       INDEXOUTOFBOUNDS
@@ -30,7 +27,7 @@ class BinaryData {
     AccessStatus toggleFlag(uint8_t index, unsigned char mask);
     AccessStatus writeFlag(uint8_t index, unsigned char mask, bool value);
     AccessStatus writeByte(uint8_t index, unsigned char value);
-    AccessStatus writeData(uint8_t index, BinaryData* data);
+    AccessStatus writeData(uint8_t index, BinaryData* data, uint8_t from, uint8_t to);
     BoolResult readFlag(uint8_t index, unsigned char mask, unsigned char comparator);
     ByteResult readByte(uint8_t index);
     LongResult readLong(uint8_t index);
@@ -77,6 +74,13 @@ class BinaryBuffer {
       }
       return result;
     }
+    BinaryData::AccessStatus write(BinaryBuffer *otherBuffer) {
+    	BinaryData::AccessStatus result = _data->writeData(_position, otherBuffer->_data, otherBuffer->_position, otherBuffer->_position + _data->getSize());
+    	if (result == BinaryData::OK) {
+    		_position+= _data->getSize() - 1;
+    	}
+    	return result;
+	}
     boolean goTo(int index) {
       if (index < _data->getSize() - 1) {
         _position = index;

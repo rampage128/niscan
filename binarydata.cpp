@@ -1,6 +1,11 @@
 #include <arduino.h>
 #include "binarydata.h"
 
+BinaryData::BinaryData(uint8_t len) {
+  _len = len;
+  _payload = (char*)calloc(sizeof(char), _len+1);
+}
+
 BinaryData::~BinaryData() {
   free(_payload);
 }
@@ -50,6 +55,8 @@ BinaryData::AccessStatus BinaryData::toggleFlag(uint8_t index, unsigned char mas
   }
 
   _payload[index] ^= mask;
+
+  return AccessStatus::OK;
 }
 
 BinaryData::AccessStatus BinaryData::writeFlag(uint8_t index, unsigned char mask, bool value) {
@@ -72,30 +79,30 @@ BinaryData::AccessStatus BinaryData::writeByte(uint8_t index, unsigned char valu
   }
 
   _payload[index] = value;
-  return STATUS::OK;
+  return AccessStatus::OK;
 }
 
-BinaryData::AccessStatus BinaryData::writeData(uint8_t index, BinaryData* data) {
-  int inputLen = index + data->getSize();
+BinaryData::AccessStatus BinaryData::writeData(uint8_t index, BinaryData* data, uint8_t from, uint8_t to) {
+  int inputLen = to - from;
 
   if (checkIndex(index) == AccessStatus::INDEXOUTOFBOUNDS) {
     return AccessStatus::INDEXOUTOFBOUNDS;
   }
-  if (checkIndex(inputLen-1) == AccessStatus::INDEXOUTOFBOUNDS) {
+  if (checkIndex(index + inputLen - 1) == AccessStatus::INDEXOUTOFBOUNDS) {
     return AccessStatus::INDEXOUTOFBOUNDS;
   }
 
-  char* inputData = data->getData();
+  char* inputData = data->_payload;
 
-  for (int i = index; i < inputLen; i++) {
-    _payload[i] = inputData[i - index];
+  for (int i = 0; i < inputLen; i++) {
+    _payload[index + i] = inputData[from + i];
   }
 
-  return STATUS::OK;
+  return AccessStatus::OK;
 }
 
 BinaryData::AccessStatus BinaryData::checkIndex(uint8_t index) {
-    if (_len <= index || index < 0) {
+    if (_len <= index) {
     return AccessStatus::INDEXOUTOFBOUNDS;
   }
   return AccessStatus::OK;
